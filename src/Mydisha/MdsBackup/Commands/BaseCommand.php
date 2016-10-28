@@ -54,13 +54,6 @@ class BaseCommand extends Command {
 	}
 
 	/**
-	 * @return string
-	 */
-	protected function getInitialName() {
-		return config::get('mds-backup.initial_name');
-	}
-
-	/**
 	 * @return boolean
 	 */
 	public function enableCompression() {

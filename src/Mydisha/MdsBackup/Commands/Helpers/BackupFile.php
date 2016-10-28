@@ -1,4 +1,5 @@
 <?php namespace Mydisha\MdsBackup\Commands\Helpers;
+use Illuminate\Support\Facades\Config;
 
 class BackupFile {
 
@@ -32,14 +33,6 @@ class BackupFile {
 	/**
 	 * @return string
 	 */
-
-	public function custom_name() {
-
-	}
-
-	/**
-	 * @return string
-	 */
 	public function path() {
 		return $this->filePath;
 	}
@@ -50,10 +43,12 @@ class BackupFile {
 	 * @return void
 	 */
 	private function build($dumpPath, $fileExtension) {
-		if (is_null($this->getInitialName)) {
+		$initial_name = Config::get('mds-backup.initial_name');
+		if (empty($initial_name)) {
 			$this->fileName = date('YmdHis') . '.' . $fileExtension;
 		} else {
 			$this->fileName = $this . getInitialName . '-' . date('YmdHis') . '.' . $fileExtension;
+
 		}
 		$this->filePath = rtrim($dumpPath, '/') . '/' . $this->fileName;
 	}
