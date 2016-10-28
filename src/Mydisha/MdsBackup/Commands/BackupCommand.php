@@ -1,82 +1,75 @@
-<?php 
+<?php
 
-namespace Witty\LaravelDbBackup\Commands;
+namespace Mydisha\MdsBackup\Commands;
 
 use Aws\Laravel\AwsFacade as AWS;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\Console\Input\InputOption;
+use Mydisha\MdsBackup\Commands\Helpers\BackupFile;
+use Mydisha\MdsBackup\Commands\Helpers\BackupHandler;
 use Symfony\Component\Console\Input\InputArgument;
-use Witty\LaravelDbBackup\Commands\Helpers\BackupFile;
-use Witty\LaravelDbBackup\Commands\Helpers\BackupHandler;
+use Symfony\Component\Console\Input\InputOption;
 
-class BackupCommand extends BaseCommand 
-{
+class BackupCommand extends BaseCommand {
 	/**
 	 * @var string
 	 */
 	protected $name = 'db:backup';
-	protected $description = 'Backup the default database to `storage/dumps`';
+	protected $description = 'Backup the default database to `storage/backup_db`';
 	protected $filePath;
 	protected $fileName;
 
 	/**
 	 * @return void
 	 */
-	public function fire()
-	{
+	public function fire() {
 		$database = $this->getDatabase($this->input->getOption('database'));
 
 		$this->checkDumpFolder();
 
 		//----------------
-		$dbfile = new BackupFile( $this->argument('filename'), $database, $this->getDumpsPath() );
+		$dbfile = new BackupFile($this->argument('filename'), $database, $this->getDumpsPath());
 		$this->filePath = $dbfile->path();
 		$this->fileName = $dbfile->name();
 
 		$status = $database->dump($this->filePath);
-		$handler = new BackupHandler( $this->colors );
+		$handler = new BackupHandler($this->colors);
 
 		// Error
 		//----------------
-		if ($status !== true)
-		{
-			return $this->line( $handler->errorResponse( $status ) );
+		if ($status !== true) {
+			return $this->line($handler->errorResponse($status));
 		}
 
 		// Compression
 		//----------------
-		if ($this->isCompressionEnabled())
-		{
+		if ($this->isCompressionEnabled()) {
 			$this->compress();
 			$this->fileName .= ".gz";
 			$this->filePath .= ".gz";
 		}
 
-		$this->line( $handler->dumpResponse( $this->argument('filename'), $this->filePath, $this->fileName ) );
+		$this->line($handler->dumpResponse($this->argument('filename'), $this->filePath, $this->fileName));
 
 		// S3 Upload
 		//----------------
-		if ($this->option('upload-s3'))
-		{
+		if ($this->option('upload-s3')) {
 			$this->uploadS3();
-			$this->line( $handler->s3DumpResponse() );
+			$this->line($handler->s3DumpResponse());
 
-			if ($this->option('keep-only-s3'))
-			{
+			if ($this->option('keep-only-s3')) {
 				File::delete($this->filePath);
-				$this->line( $handler->localDumpRemovedResponse() );
+				$this->line($handler->localDumpRemovedResponse());
 			}
 		}
 	}
 
 	/**
 	 * Perform Gzip compression on file
-	 * 
+	 *
 	 * @return boolean
-	 */ 
-	protected function compress()
-	{
+	 */
+	protected function compress() {
 		$command = sprintf('gzip -9 %s', $this->filePath);
 
 		return $this->console->run($command);
@@ -87,8 +80,7 @@ class BackupCommand extends BaseCommand
 	 *
 	 * @return array
 	 */
-	protected function getArguments()
-	{
+	protected function getArguments() {
 		return [
 			['filename', InputArgument::OPTIONAL, 'Filename or -path for the dump.'],
 		];
@@ -97,24 +89,21 @@ class BackupCommand extends BaseCommand
 	/**
 	 * @return array
 	 */
-	protected function getOptions()
-	{
+	protected function getOptions() {
 		return [
 			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to backup'],
 			['upload-s3', 'u', InputOption::VALUE_REQUIRED, 'Upload the dump to your S3 bucket'],
-			['keep-only-s3', true, InputOption::VALUE_NONE, 'Delete the local dump after upload to S3 bucket']
+			['keep-only-s3', true, InputOption::VALUE_NONE, 'Delete the local dump after upload to S3 bucket'],
 		];
 	}
 
 	/**
 	 * @return void
 	 */
-	protected function checkDumpFolder()
-	{
+	protected function checkDumpFolder() {
 		$dumpsPath = $this->getDumpsPath();
 
-		if ( ! is_dir($dumpsPath))
-		{
+		if (!is_dir($dumpsPath)) {
 			mkdir($dumpsPath);
 		}
 	}
@@ -122,13 +111,12 @@ class BackupCommand extends BaseCommand
 	/**
 	 * @return void
 	 */
-	protected function uploadS3()
-	{
+	protected function uploadS3() {
 		$bucket = $this->option('upload-s3');
 		$s3 = AWS::get('s3');
 		$s3->putObject([
-			'Bucket'     => $bucket,
-			'Key'        => $this->getS3DumpsPath() . '/' . $this->fileName,
+			'Bucket' => $bucket,
+			'Key' => $this->getS3DumpsPath() . '/' . $this->fileName,
 			'SourceFile' => $this->filePath,
 		]);
 	}
@@ -136,10 +124,9 @@ class BackupCommand extends BaseCommand
 	/**
 	 * @return string
 	 */
-	protected function getS3DumpsPath()
-	{
+	protected function getS3DumpsPath() {
 		$default = 'dumps';
 
-		return Config::get('db-backup.s3.path', $default);
+		return Config::get('mds-backup.s3.path', $default);
 	}
 }

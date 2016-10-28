@@ -1,14 +1,13 @@
-<?php 
+<?php
 
-namespace Witty\LaravelDbBackup\Databases;
+namespace Mydisha\MdsBackup\Databases;
 
-use Witty\LaravelDbBackup\Databases\DatabaseContract;
-use Witty\LaravelDbBackup\Console;
+use Mydisha\MdsBackup\Console;
+use Mydisha\MdsBackup\Databases\DatabaseContract;
 
-class PostgresDatabase implements DatabaseContract 
-{	
+class PostgresDatabase implements DatabaseContract {
 	/**
-	 * @var Witty\LaravelDbBackup\Console
+	 * @var Mydisha\MdsBackup\Console
 	 */
 	protected $console;
 
@@ -21,15 +20,14 @@ class PostgresDatabase implements DatabaseContract
 	protected $host;
 
 	/**
-	 * @param Witty\LaravelDbBackup\Console $destinationFile
+	 * @param Mydisha\MdsBackup\Console $destinationFile
 	 * @param string $database
 	 * @param string $user
 	 * @param string $password
 	 * @param string $host
-	 * @return Witty\LaravelDbBackup\Database\PostgresDatabase
+	 * @return Mydisha\MdsBackup\Database\PostgresDatabase
 	 */
-	public function __construct(Console $console, $database, $user, $password, $host)
-	{
+	public function __construct(Console $console, $database, $user, $password, $host) {
 		$this->console = $console;
 		$this->database = $database;
 		$this->user = $user;
@@ -39,12 +37,11 @@ class PostgresDatabase implements DatabaseContract
 
 	/**
 	 * Create a database dump
-	 * 
+	 *
 	 * @param string $destinationFile
 	 * @return boolean
 	 */
-	public function dump($destinationFile)
-	{
+	public function dump($destinationFile) {
 		$command = sprintf('PGPASSWORD=%s pg_dump -Fc --no-acl --no-owner -h %s -U %s %s > %s',
 			escapeshellarg($this->password),
 			escapeshellarg($this->host),
@@ -55,15 +52,14 @@ class PostgresDatabase implements DatabaseContract
 
 		return $this->console->run($command);
 	}
-	
+
 	/**
 	 * Restore a database dump
-	 * 
+	 *
 	 * @param string $sourceFile
 	 * @return boolean
 	 */
-	public function restore($sourceFile)
-	{
+	public function restore($sourceFile) {
 		$command = sprintf('PGPASSWORD=%s pg_restore --verbose --clean --no-acl --no-owner -h %s -U %s -d %s %s',
 			escapeshellarg($this->password),
 			escapeshellarg($this->host),
@@ -74,12 +70,11 @@ class PostgresDatabase implements DatabaseContract
 
 		return $this->console->run($command);
 	}
-	
+
 	/**
 	 * @return string
 	 */
-	public function getFileExtension()
-	{
+	public function getFileExtension() {
 		return 'dump';
 	}
 }

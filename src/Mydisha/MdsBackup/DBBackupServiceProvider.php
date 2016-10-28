@@ -1,12 +1,11 @@
-<?php 
+<?php
 
-namespace Witty\LaravelDbBackup;
+namespace Mydisha\MdsBackup;
 
-use Witty\LaravelDbBackup\DatabaseBuilder;
 use Illuminate\Support\ServiceProvider;
+use Mydisha\MdsBackup\DatabaseBuilder;
 
-class DBBackupServiceProvider extends ServiceProvider 
-{
+class DBBackupServiceProvider extends ServiceProvider {
 	/**
 	 * Indicates if loading of the provider is deferred.
 	 *
@@ -14,34 +13,30 @@ class DBBackupServiceProvider extends ServiceProvider
 	 */
 	protected $defer = false;
 
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->publishes([
-        	__DIR__ . '/../../config/config.php' => config_path('db-backup.php'),    	
-    	]);
-    }
+	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot() {
+		$this->publishes([
+			__DIR__ . '/../../config/config.php' => config_path('mds-backup.php'),
+		]);
+	}
 
 	/**
 	 * Register the service provider.
 	 *
 	 * @return void
 	 */
-	public function register()
-	{
+	public function register() {
 		$databaseBuilder = new DatabaseBuilder();
 
-		$this->app['db.backup'] = $this->app->share(function($app) use ($databaseBuilder)
-		{
+		$this->app['db.backup'] = $this->app->share(function ($app) use ($databaseBuilder) {
 			return new Commands\BackupCommand($databaseBuilder);
 		});
 
-		$this->app['db.restore'] = $this->app->share(function($app) use ($databaseBuilder)
-		{
+		$this->app['db.restore'] = $this->app->share(function ($app) use ($databaseBuilder) {
 			return new Commands\RestoreCommand($databaseBuilder);
 		});
 
@@ -56,8 +51,7 @@ class DBBackupServiceProvider extends ServiceProvider
 	 *
 	 * @return array
 	 */
-	public function provides()
-	{
+	public function provides() {
 		return [];
 	}
 

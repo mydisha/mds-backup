@@ -1,22 +1,19 @@
-<?php 
+<?php
 
-namespace Witty\LaravelDbBackup;
+namespace Mydisha\MdsBackup;
 
 use Symfony\Component\Process\Process;
 
-class Console
-{
-	public function run($command)
-	{
+class Console {
+	public function run($command) {
 		$process = new Process($command);
 		$process->setTimeout(999999999);
 		$process->run();
 
-		if ($process->isSuccessful())
-		{
+		if ($process->isSuccessful()) {
 			return true;
 		}
-		
+
 		return $process->getErrorOutput();
 	}
 }
