@@ -1,9 +1,8 @@
 <?php
 
-
 return [
 
-	'path' => storage_path() . '/dumps/',
+	'path' => storage_path() . '/backup_db/',
 
 	'mysql' => [
 		'dump_command_path' => '',
@@ -11,9 +10,8 @@ return [
 	],
 
 	's3' => [
-		'path' => ''
+		'path' => '',
 	],
 
-    'compress' => false,
+	'compress' => false,
 ];
-

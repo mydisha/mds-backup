@@ -1,14 +1,13 @@
-<?php 
+<?php
 
-namespace Witty\LaravelDbBackup\Databases;
+namespace Mydisha\MdsBackup\Databases;
 
-use Witty\LaravelDbBackup\Databases\DatabaseContract;
-use Witty\LaravelDbBackup\Console;
+use Mydisha\MdsBackup\Console;
+use Mydisha\MdsBackup\Databases\DatabaseContract;
 
-class SqliteDatabase implements DatabaseContract 
-{	
+class SqliteDatabase implements DatabaseContract {
 	/**
-	 * @var Witty\LaravelDbBackup\Console
+	 * @var Mydisha\MdsBackup\Console
 	 */
 	protected $console;
 
@@ -18,24 +17,22 @@ class SqliteDatabase implements DatabaseContract
 	protected $databaseFile;
 
 	/**
-	 * @param Witty\LaravelDbBackup\Console $destinationFile
+	 * @param Mydisha\MdsBackup\Console $destinationFile
 	 * @param string $databaseFile
-	 * @return Witty\LaravelDbBackup\Database\SqliteDatabase
+	 * @return Mydisha\MdsBackup\Database\SqliteDatabase
 	 */
-	public function __construct(Console $console, $databaseFile)
-	{
+	public function __construct(Console $console, $databaseFile) {
 		$this->console = $console;
 		$this->databaseFile = $databaseFile;
 	}
 
 	/**
 	 * Create a database dump
-	 * 
+	 *
 	 * @param string $destinationFile
 	 * @return boolean
 	 */
-	public function dump($destinationFile)
-	{
+	public function dump($destinationFile) {
 		$command = sprintf('cp %s %s',
 			escapeshellarg($this->databaseFile),
 			escapeshellarg($destinationFile)
@@ -43,15 +40,14 @@ class SqliteDatabase implements DatabaseContract
 
 		return $this->console->run($command);
 	}
-	
+
 	/**
 	 * Restore a database dump
-	 * 
+	 *
 	 * @param string $sourceFile
 	 * @return boolean
 	 */
-	public function restore($sourceFile)
-	{
+	public function restore($sourceFile) {
 		$command = sprintf('cp -f %s %s',
 			escapeshellarg($sourceFile),
 			escapeshellarg($this->databaseFile)
@@ -59,12 +55,11 @@ class SqliteDatabase implements DatabaseContract
 
 		return $this->console->run($command);
 	}
-	
+
 	/**
 	 * @return string
 	 */
-	public function getFileExtension()
-	{
+	public function getFileExtension() {
 		return 'sqlite';
 	}
 }
