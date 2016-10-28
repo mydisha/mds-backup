@@ -47,7 +47,7 @@ class BackupFile {
 		if (empty($initial_name)) {
 			$this->fileName = date('YmdHis') . '.' . $fileExtension;
 		} else {
-			$this->fileName = $this . getInitialName . '-' . date('YmdHis') . '.' . $fileExtension;
+			$this->fileName = $initial_name . '-' . date('YmdHis') . '.' . $fileExtension;
 
 		}
 		$this->filePath = rtrim($dumpPath, '/') . '/' . $this->fileName;
